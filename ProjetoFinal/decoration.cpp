@@ -175,7 +175,7 @@ void initializeDecorations() {
         Decoration rock;
         rock.loadOBJ("models/seashell_obj.obj");
         rock.posX = 2.0f;
-        rock.posY = -2.3f;
+        rock.posY = -3.2f;
         rock.posZ = 0.0f;
         rock.scale = 0.5f;
     
@@ -191,12 +191,12 @@ void initializeDecorations() {
     {
         Decoration diver;
         diver.loadOBJ("mergulhador/13018_Aquarium_Deep_Sea_Diver_v1_L1.obj");
-        diver.posX = 2.0f;
+        diver.posX = 3.2f;
         diver.posY = -1.5f; 
-        diver.posZ = 0.0f;
+        diver.posZ = 0.45f;
         diver.scale = 0.1f;
-        diver.rotX = -90.0f;
-        diver.rotY  = 0.0f;
+        diver.rotX = -79.0f;
+        diver.rotY  = 0.25f;
         
 
         // Carrega a textura do mergulhador (JPG)
@@ -204,8 +204,27 @@ void initializeDecorations() {
 
         decorations.push_back(diver);
     }
-    // ...
-}
+    {
+        Decoration boat;
+        // Carrega o OBJ do navio
+        boat.loadOBJ("navio/Marlow66.obj");
+    
+        // Posição, escala e rotação para que fique visível
+        boat.posX = 0.0f;
+        boat.posY = -1.8f; // se o fundo do aquário é -2.5
+        boat.posZ = 0.0f;
+        boat.scale = 0.3f;  // teste valores
+        boat.rotY  = 180.0f; // gire conforme precise
+        boat.rotX = 0.25f;
+    
+        // Força uma única textura (por exemplo, a da madeira)
+        boat.setTexture("navio/FineWood.jpg");
+    
+        decorations.push_back(boat);
+    }
+    
+
+    }
 
 void updateDecorations(float /*deltaTime*/) {
     // Caso queiramos animar...
