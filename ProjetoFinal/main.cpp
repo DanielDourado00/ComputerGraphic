@@ -19,41 +19,43 @@ void display() {
     // Aplica as transformações da câmera
     camera.apply();
 
-    // Desenha o aquário e os elementos
+    // Desenha a cena principal
     drawAquarium();
     drawAlgae();
     drawFish();
     drawBubbles();
-    
 
     // --- Renderização de sombras ---
-    // Definindo o plano para a projeção da sombra:
-    // Nosso aquário tem altura 5.0, portanto o fundo está em y = -2.5.
-    // A equação do plano é: 0*x + 1*y + 0*z + 2.5 = 0  (ou seja, y + 2.5 = 0)
-    GLfloat groundPlane[4] = { 0.0f, 1.0f, 0.0f, 2.5f }; // Plano do fundo do aquário
-    // A mesma posição de luz definida em initLighting
-    GLfloat lightPos[4]   = { 0.0f, 2.0f, 2.0f, 1.0f }; // Posição da luz
+    // Definindo o plano para a projeção da sombra (y + 2.5 = 0)
+    GLfloat groundPlane[4] = { 0.0f, 1.0f, 0.0f, 2.5f };
+    // A mesma posição de luz usada em initLighting()
+    GLfloat lightPos[4]   = { 0.0f, 2.0f, 2.0f, 1.0f }; 
     GLfloat shadowMat[4][4];
     setShadowMatrix(shadowMat, groundPlane, lightPos);
 
-    // Salva a matriz atual e multiplica pela matriz de sombra
+    // Multiplica pela matriz de sombra
     glPushMatrix();
-    glMultMatrixf((GLfloat*)shadowMat);
+        glMultMatrixf((GLfloat*)shadowMat);
 
-    // Desabilita a iluminação para desenhar as sombras com cor escura
-    glDisable(GL_LIGHTING);
-// Desabilita o blending para garantir que a sombra seja preta sem mistura
-glDisable(GL_BLEND);
-glColor4f(0.0f, 0.0f, 0.0f, 1.0f); // sombra preta 
-drawFish();
-glEnable(GL_LIGHTING);
+        // Desativa a iluminação para desenhar “silhuetas”
+        glDisable(GL_LIGHTING);
+        // Se quiser sombra sólida, também desative o blending ou defina cor com alpha = 1.0
+        glDisable(GL_BLEND);
+        
+        // Define cor preta (ou cinza) para a sombra
+        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
-    // Restaura o estado original
-    glEnable(GL_LIGHTING);
+        // Agora chamamos drawFish(true) para desenhar os peixes em modo sombra
+        drawFish(true);
+
+        // Restaura o estado
+        glEnable(GL_LIGHTING);
     glPopMatrix();
+    // --- Fim da projeção de sombras ---
 
     glutSwapBuffers();
 }
+
 
 void reshape(int w, int h) {
     if (h == 0) h = 1;
@@ -135,29 +137,33 @@ void timer(int value) {
 }
 
 
+
+
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutInitWindowSize(800, 600);
-    glutCreateWindow("Aquário 3D");
+glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+glutInitWindowSize(800, 600);
+glutCreateWindow("Aquário 3D");
 
-    glEnable(GL_DEPTH_TEST);
+glEnable(GL_DEPTH_TEST);
 
-    // Inicializa os módulos
-    initLighting();
-    initializeAlgae();
-    initializeFish();
-    initializeBubbles();
+// Inicializa módulos (including initializeAquarium() que carrega a textura)
+initLighting();
+initializeAquarium();
+initializeAlgae();
+initializeFish();
+initializeBubbles();
 
-    // Registra os callbacks
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard);
-    glutMotionFunc(mouseMotion);
-    glutPassiveMotionFunc(mouseMotion);
-    glutTimerFunc(0, timer, 0);
+// Registra os callbacks
+glutDisplayFunc(display);
+glutReshapeFunc(reshape);
+glutKeyboardFunc(keyboard);
+glutMotionFunc(mouseMotion);
+glutPassiveMotionFunc(mouseMotion);
+glutTimerFunc(0, timer, 0);
 
-    glutMainLoop();
+glutMainLoop();
+
     return 0;
 }
 

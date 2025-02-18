@@ -12,9 +12,6 @@ const float halfDepth  = 8.0f / 2.0f;
 
 #define NUM_FISH 5  // Número de peixes
 
-// Define o flag global (inicia como falso)
-bool shadowMode = false;
-
 static Fish fishArray[NUM_FISH];
 
 Fish::Fish() {
@@ -28,11 +25,12 @@ Fish::Fish() {
     velY = ((float)rand() / RAND_MAX) * 0.4f - 0.2f;
     velZ = ((float)rand() / RAND_MAX) * 0.4f - 0.2f;
 
+    // Inicializa temporizador para bolhas
     bubbleTimer = 0.0f;
 }
 
 void Fish::update(float deltaTime) {
-    // Movimentação básica
+    // Movimentação
     posX += velX * deltaTime;
     posY += velY * deltaTime;
     posZ += velZ * deltaTime;
@@ -42,103 +40,117 @@ void Fish::update(float deltaTime) {
     if (posY < -halfHeight || posY > halfHeight) velY = -velY;
     if (posZ < -halfDepth || posZ > halfDepth)   velZ = -velZ;
 
-    // Emissão de bolhas a cada X segundos (se quiser)
+    // Exemplo de emissão de bolhas a cada 10s:
     bubbleTimer += deltaTime;
     if (bubbleTimer >= 10.0f) {
-        // createFishBubble(posX, posY, posZ);
+        // createFishBubble(posX, posY, posZ); 
         bubbleTimer = 0.0f;
     }
 }
 
-void Fish::draw() {
+// Recebe um parâmetro "shadowMode" (padrão = false). Se shadowMode for true,
+// desenhamos o peixe somente em preto (sem chamar glColor3f(...) para partes).
+void Fish::draw(bool shadowMode) {
     glPushMatrix();
     glTranslatef(posX, posY, posZ);
 
+    // Ajusta rotação do peixe com base na direção do movimento
     float angle = atan2(velZ, velX) * (180.0f / M_PI);
     glRotatef(-angle, 0.0f, 1.0f, 0.0f);
 
-    // Agora chamamos a função que desenha o peixe todo com primitivas
-    drawGeometricFish();
+    drawGeometricFish(shadowMode);
 
     glPopMatrix();
 }
 
-
-void Fish::drawGeometricFish() {
-    // Definindo uma cor laranja para o corpo
-    glColor3f(1.0f, 0.7f, 0.0f);
-
-    // Corpo: esfera escalonada (mais longa no eixo X e achatada no eixo Z)
+// Desenha as partes do peixe. Se shadowMode for true, não chamamos glColor.
+void Fish::drawGeometricFish(bool shadowMode) {
+    // Corpo
+    if (!shadowMode) {
+        glColor3f(1.0f, 0.7f, 0.0f);  // cor laranja para o corpo
+    }
     glPushMatrix();
-        glScalef(1.5f, 0.8f, 0.4f); // Ajuste conforme desejar
+        // Esfera escalonada (mais longa no eixo X, achatada no Z)
+        glScalef(1.5f, 0.8f, 0.4f);
         glutSolidSphere(0.3, 20, 20);
     glPopMatrix();
 
-    // Cauda: cone na parte de trás
-    glColor3f(1.0f, 0.5f, 0.0f);
+    // Cauda
+    if (!shadowMode) {
+        glColor3f(1.0f, 0.5f, 0.0f);
+    }
     glPushMatrix();
-        // Mover-se para trás do corpo
-        glTranslatef(-0.45f, 0.0f, 0.0f);
-        // Girar para ficar perpendicular ao eixo X
+        glTranslatef(-0.65f, 0.0f, 0.0f);
         glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
         glutSolidCone(0.15, 0.4, 10, 2);
     glPopMatrix();
 
-    // Nadadeira Superior (dorsal)
+    // Nadadeira superior
+    if (!shadowMode) {
+        glColor3f(1.0f, 0.6f, 0.0f);
+    }
     glPushMatrix();
-        glTranslatef(-0.2f, 0.25f, 0.0f);
-        // Deitar o cone
+        glTranslatef(0.0f, 0.20f, 0.0f);
         glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
         glutSolidCone(0.1, 0.2, 10, 2);
     glPopMatrix();
 
-    // Nadadeira Inferior (ventral)
+    // Nadadeira inferior
+    if (!shadowMode) {
+        glColor3f(1.0f, 0.6f, 0.0f);
+    }
     glPushMatrix();
-        glTranslatef(-0.2f, -0.25f, 0.0f);
+        glTranslatef(0.0f, -0.18f, 0.0f);
         glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
         glutSolidCone(0.1, 0.2, 10, 2);
     glPopMatrix();
 
-    // Nadadeiras Laterais (peitorais)
-    // Uma de cada lado do peixe
+    // Nadadeiras laterais
+    if (!shadowMode) {
+        glColor3f(1.0f, 0.5f, 0.0f);
+    }
+    // Lateral direita
     glPushMatrix();
-        glTranslatef(0.0f, 0.0f, 0.25f); // Ajuste para a lateral direita
-        glRotatef(90.0f, 1.0f, 0.0f, 0.0f); //
+        glTranslatef(0.0f, 0.0f, 0.25f);
+        glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+        glutSolidCone(0.08, 0.15, 10, 2);
+    glPopMatrix();
+    // Lateral esquerda
+    glPushMatrix();
+        glTranslatef(0.0f, 0.0f, -0.25f);
+        // Sem rotação extra aqui, se preferir
         glutSolidCone(0.08, 0.15, 10, 2);
     glPopMatrix();
 
-    glPushMatrix();
-        glTranslatef(0.0f, 0.0f, -0.25f); // Ajuste para a lateral esquerda
-        glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-        glutSolidCone(0.08, 0.15, 10, 2);
-    glPopMatrix();
+    // Olhos e Pupilas (se não estiver em modo sombra)
+    if (!shadowMode) {
+        // Olhos (brancos)
+        glColor3f(1.0f, 1.0f, 1.0f);
+        // Olho esquerdo
+        glPushMatrix();
+            glTranslatef(0.35f, 0.05f, 0.12f);
+            glutSolidSphere(0.04, 10, 10);
+        glPopMatrix();
+        // Olho direito
+        glPushMatrix();
+            glTranslatef(0.35f, 0.05f, -0.12f);
+            glutSolidSphere(0.04, 10, 10);
+        glPopMatrix();
 
-    // Olhos: pequenas esferas brancas
-    glColor3f(1.0f, 1.0f, 1.0f);
-    // Olho esquerdo
-    glPushMatrix();
-        // Leve inclinação para frente e para o lado
-        glTranslatef(0.35f, 0.05f, 0.12f);
-        glutSolidSphere(0.04, 10, 10);
-    glPopMatrix();
-    // Olho direito
-    glPushMatrix();
-        glTranslatef(0.35f, 0.05f, -0.12f);
-        glutSolidSphere(0.04, 10, 10);
-    glPopMatrix();
-
-    // Pupilas (opcional): esferas pretas dentro dos olhos
-    glColor3f(0.0f, 0.0f, 0.0f);
-    glPushMatrix();
-        glTranslatef(0.35f, 0.05f, 0.12f);
-        glutSolidSphere(0.015, 10, 10);
-    glPopMatrix();
-    glPushMatrix();
-        glTranslatef(0.35f, 0.05f, -0.12f);
-        glutSolidSphere(0.015, 10, 10);
-    glPopMatrix();
+        // Pupilas (pretas)
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glPushMatrix();
+            glTranslatef(0.35f, 0.05f, 0.12f);
+            glutSolidSphere(0.015, 10, 10);
+        glPopMatrix();
+        glPushMatrix();
+            glTranslatef(0.35f, 0.05f, -0.12f);
+            glutSolidSphere(0.015, 10, 10);
+        glPopMatrix();
+    }
 }
 
+// Funções globais para gerenciar o array de peixes
 
 void initializeFish() {
     srand((unsigned int)time(0));
@@ -153,8 +165,9 @@ void updateFish(float deltaTime) {
     }
 }
 
-void drawFish() {
+// Desenha todos os peixes. Se shadowMode for true, não usamos cores internas.
+void drawFish(bool shadowMode) {
     for (int i = 0; i < NUM_FISH; i++) {
-        fishArray[i].draw();
+        fishArray[i].draw(shadowMode);
     }
 }
