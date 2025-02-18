@@ -1,7 +1,7 @@
 // decoration.cpp
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+#include "tiny_obj_loader.h" //libs para carregar objetos 3D
 
 #include "decoration.h"
 #include "soil/include/SOIL/SOIL.h"
@@ -42,6 +42,10 @@ bool Decoration::loadOBJ(const std::string& filename) {
     normals.clear();
     texcoords.clear();
 
+    float minX = 999999.0f, maxX = -999999.0f;  // para cálculo de centro
+    float minY = 999999.0f, maxY = -999999.0f;  
+    float minZ = 999999.0f, maxZ = -999999.0f;
+
     // Para cada shape (obj pode ter vários subobjetos)
     for (size_t s = 0; s < shapes.size(); s++) {
         size_t indexOffset = 0;
@@ -59,6 +63,7 @@ bool Decoration::loadOBJ(const std::string& filename) {
                 vertices.push_back(vx);
                 vertices.push_back(vy);
                 vertices.push_back(vz);
+                
 
                 // Normal
                 if (idx.normal_index >= 0 && 

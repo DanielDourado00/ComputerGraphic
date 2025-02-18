@@ -9,7 +9,7 @@ public:
     
     Camera();
     void apply();
-    void processMouseMotion(int x, int y);
+    //void processMouseMotion(int x, int y);
 };
 
 #endif // CAMERA_H

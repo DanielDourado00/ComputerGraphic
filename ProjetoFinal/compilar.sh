@@ -16,6 +16,7 @@ g++ \
   fish3d.cpp \
   -o aquario \
   -lGL -lGLU -lglut -lSOIL \
+  -lSDL2 -lSDL2_mixer \
   -std=c++11
 
 # Se não houver erro, exibe:

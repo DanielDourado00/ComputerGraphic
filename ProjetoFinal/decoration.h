@@ -14,6 +14,7 @@ public:
     // Posição e escala
     float posX, posY, posZ;
     float scale;
+    
 
     // Agora teremos rotação em 3 eixos
     float rotX, rotY, rotZ;

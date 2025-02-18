@@ -11,14 +11,3 @@ void Camera::apply() {
     glTranslatef(-posX, -posY, -posZ);
 }
 
-void Camera::processMouseMotion(int x, int y) {
-    // Atualiza a orientação da câmera com base no movimento do mouse
-    static int lastX = x, lastY = y;
-    int dx = x - lastX;
-    int dy = y - lastY;
-    lastX = x;
-    lastY = y;
-    
-    yaw   += dx * 0.1f;
-    pitch += dy * 0.1f;
-}

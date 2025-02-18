@@ -51,7 +51,8 @@ void drawAquarium() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Desenha as paredes (opcionalmente translúcidas)
-    glColor4f(0.0f, 0.0f, 1.0f, 0.3f);
+    // Cor quase branca, com alpha baixo (0.15 ~ 0.3)
+    glColor4f(0.8f, 0.9f, 1.0f, 0.2f);
     glBegin(GL_QUADS);
         // Face frontal
         glVertex3f(-width/2, -height/2, depth/2);
