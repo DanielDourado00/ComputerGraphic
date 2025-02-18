@@ -25,11 +25,10 @@ void display() {
 
     // Desenha a cena principal
     drawAquarium();
+    drawDecorations();
     drawAlgae();
     drawFish();
     drawBubbles();
-     // Desenha as decorações depois do aquário
-     drawDecorations();
 
     // --- Renderização de sombras ---
     // Se deseja manter as sombras vindas de GL_LIGHT0, use a posição a seguir.

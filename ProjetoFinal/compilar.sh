@@ -13,6 +13,7 @@ g++ \
   lighting.cpp \
   algae.cpp \
   decoration.cpp \
+  fish3d.cpp \
   -o aquario \
   -lGL -lGLU -lglut -lSOIL \
   -std=c++11

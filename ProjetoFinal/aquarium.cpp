@@ -78,7 +78,7 @@ void drawAquarium() {
         glVertex3f(width/2, height/2, -depth/2);
     glEnd();
 
-    // Face inferior com textura de areia
+    /* // Face inferior com textura de areia
     glDisable(GL_BLEND); // desativa blending para o chão texturizado
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, sandTextureID);
@@ -103,10 +103,10 @@ void drawAquarium() {
         glVertex3f(-width/2, -height/2, depth/2);
     glEnd();
 
-    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D); */
 
     // Opcional: desenhar as arestas do aquário
-    glColor3f(0.0f, 0.0f, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f); 
     glBegin(GL_LINES);
         // linhas da face frontal
         glVertex3f(-width/2, -height/2, depth/2);

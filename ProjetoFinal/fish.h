@@ -4,24 +4,21 @@
 
 class Fish {
 public:
-    float posX, posY, posZ;     // Posição do peixe
-    float velX, velY, velZ;     // Velocidade do peixe
-    float bubbleTimer;          // Temporizador para emissão de bolhas
+    float posX, posY, posZ;
+    float velX, velY, velZ;
+    float bubbleTimer;
 
-    // NOVAS VARIÁVEIS para animação da cauda
-    float tailPhase;            // controla o ângulo ou fase do movimento
-    float tailSpeed;            // controla a velocidade de oscilação
-
+    // Construtor
     Fish();
     void update(float deltaTime);
-    void draw(bool shadowMode = false);
+    void draw();
 
 private:
-    void drawGeometricFish(bool shadowMode = false);
+    // Nada aqui, pois o modelo 3D é global/estático
 };
 
-void initializeFish();
+void initializeFish();  // Carrega o modelo e cria os peixes
 void updateFish(float deltaTime);
 void drawFish(bool shadowMode = false);
 
-#endif // FISH_H
+#endif

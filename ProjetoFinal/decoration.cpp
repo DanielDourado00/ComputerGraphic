@@ -170,20 +170,26 @@ void Decoration::draw() {
 
 void initializeDecorations() {
     
-    // Exemplo: criamos uma rocha, um baú, etc.
     {
-        Decoration rock;
-        rock.loadOBJ("models/seashell_obj.obj");
-        rock.posX = 2.0f;
-        rock.posY = -3.2f;
-        rock.posZ = 0.0f;
-        rock.scale = 0.5f;
-    
-        rock.rotX = 0.0f; // sem girar no X
-        rock.rotY = 0.0f; // sem girar no Y
-        rock.rotZ = 0.0f; // sem girar no Z
-    
-        decorations.push_back(rock);
+        Decoration terrain;
+
+        terrain.loadOBJ("terreno/map_697494cf-ea4b-4cf1-8341-dd55369a8c5e_densified_mesh_textured.obj");
+
+        terrain.setTexture("terreno/map_697494cf-ea4b-4cf1-8341-dd55369a8c5e_densified_mesh_textured_4096.jpg");
+        
+        // Ajuste a posição para onde você quer exibir no aquário
+        terrain.posX = 0.0f;
+        terrain.posY = 0.75f;   // em ordem crescente: 0.0 0.25 0.5 0.75 1.0
+        terrain.posZ = 0.0f;
+        
+        // Ajuste a escala conforme necessário
+        terrain.scale = 2.3f;   // experimente valores maiores ou menores
+        // Se o modelo vier deitado, rotacione no eixo X:
+        terrain.rotX = 0.0f;  
+        terrain.rotY = 0.0f;
+        terrain.rotZ = 0.0f;
+
+        decorations.push_back(terrain);
     }
     
 
@@ -191,12 +197,13 @@ void initializeDecorations() {
     {
         Decoration diver;
         diver.loadOBJ("mergulhador/13018_Aquarium_Deep_Sea_Diver_v1_L1.obj");
-        diver.posX = 3.2f;
-        diver.posY = -1.5f; 
+        diver.posX = 2.2f;
+        diver.posY = -2.0f; 
         diver.posZ = 0.45f;
-        diver.scale = 0.1f;
+        diver.scale = 0.15f;
         diver.rotX = -79.0f;
-        diver.rotY  = 0.25f;
+        diver.rotY  = 0.95f; // gire conforme precise, para girar para esquerda é 
+        diver.rotZ = -0.45f;
         
 
         // Carrega a textura do mergulhador (JPG)
@@ -210,12 +217,12 @@ void initializeDecorations() {
         boat.loadOBJ("navio/Marlow66.obj");
     
         // Posição, escala e rotação para que fique visível
-        boat.posX = 0.0f;
-        boat.posY = -1.8f; // se o fundo do aquário é -2.5
-        boat.posZ = 0.0f;
+        boat.posX = -2.0f;
+        boat.posY = -2.0f; // se o fundo do aquário é -2.5
+        boat.posZ = 1.0f;
         boat.scale = 0.3f;  // teste valores
-        boat.rotY  = 180.0f; // gire conforme precise
-        boat.rotX = 0.25f;
+        boat.rotY  = 120.0f; // gire conforme precise
+        boat.rotX = 0.125f;
     
         // Força uma única textura (por exemplo, a da madeira)
         boat.setTexture("navio/FineWood.jpg");
@@ -232,6 +239,12 @@ void updateDecorations(float /*deltaTime*/) {
 
 void drawDecorations() {
     for (auto &dec : decorations) {
+        if (!dec.useTexture) {
+            // Se o objeto não tem textura, garanta que a cor seja branca
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glDisable(GL_TEXTURE_2D);
+        }
         dec.draw();
     }
 }
+
