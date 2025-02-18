@@ -8,6 +8,10 @@
 #include "algae.h"
 #include "bubbles.h"
 #include "lighting.h"
+#include "decoration.h"
+
+// g++ main.cpp aquarium.cpp camera.cpp fish.cpp bubbles.cpp lighting.cpp algae.cpp decoration.cpp -o aquario -lGL -lGLU -lglut -lSOIL
+
 
 // Instância global da câmera
 Camera camera;
@@ -24,6 +28,8 @@ void display() {
     drawAlgae();
     drawFish();
     drawBubbles();
+     // Desenha as decorações depois do aquário
+     drawDecorations();
 
     // --- Renderização de sombras ---
     // Se deseja manter as sombras vindas de GL_LIGHT0, use a posição a seguir.
@@ -128,6 +134,7 @@ void timer(int value) {
     updateFish(0.1f);
     updateBubbles(0.1f);
     updateAlgae(0.1f);
+    updateDecorations(0.1f);
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);  // Aproximadamente 60 FPS
 }
@@ -150,6 +157,8 @@ int main(int argc, char** argv) {
     initializeAlgae();
     initializeFish();
     initializeBubbles();
+    // Inicializa as decorações 3D
+    initializeDecorations();
 
     // Registra os callbacks
     glutDisplayFunc(display);
