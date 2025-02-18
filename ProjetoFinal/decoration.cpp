@@ -88,11 +88,12 @@ bool Decoration::loadOBJ(const std::string& filename) {
 
 void Decoration::draw() {
     glPushMatrix();
-        // Aplica posição, rotação e escala
-        glTranslatef(posX, posY, posZ);
-        glRotatef(rotY, 0.0f, 1.0f, 0.0f);
-        glScalef(scale, scale, scale);
-
+    glTranslatef(posX, posY, posZ);
+    // A ordem das rotações importa. Exemplo (X, Y, Z):
+    glRotatef(rotX, 1.0f, 0.0f, 0.0f);
+    glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+    glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
+    glScalef(scale, scale, scale);
         // Se os normais estiverem válidos, habilite lighting
         // e use GL_SMOOTH shading para aproveitar
         // ou já está habilitado globalmente
@@ -127,17 +128,30 @@ void initializeDecorations() {
     }
 
     {
-        Decoration chest;
-        chest.loadOBJ("models/chest.obj");
-        chest.posX = -3.0f;
-        chest.posY = -2.5f;
-        chest.posZ = 1.5f;
-        chest.scale = 0.2f;
-        chest.rotY  = 45.0f;
-        decorations.push_back(chest);
+        Decoration diver;
+        // Carrega o arquivo OBJ (ajuste o caminho conforme sua estrutura)
+        diver.loadOBJ("mergulhador/13018_Aquarium_Deep_Sea_Diver_v1_L1.obj");
+
+        // Posiciona no fundo do aquário (Y = -2.5 se seu aquário tem 5.0 de altura)
+        diver.posX = 0.0f;
+        diver.posY = -1.5f;
+        diver.rotX = -90.0f;  // rotX de -90 graus pode colocar o modelo em pé
+        diver.rotY = -5.5f; // esse eixo é para rotacionar o mergulhador
+        diver.rotZ = 0.0f;
+        diver.scale = 0.1f; // ou 0.1f, ou 2.0f, teste valores
+        
+
+        // Ajuste a escala se estiver muito grande/pequeno
+        diver.scale = 0.1111f; // 1/8 do tamanho original, para ser 1/9 seria 0.1111f
+
+        // Se quiser rotacionar
+        diver.rotY = 0.0f; //para deixar ele em pé basta colocar 0.0f
+
+        // Adiciona ao vetor global
+        decorations.push_back(diver);
     }
 
-    // E assim por diante para cada objeto
+   
 }
 
 void updateDecorations(float /*deltaTime*/) {
