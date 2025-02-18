@@ -1,51 +1,58 @@
+// decoration.cpp
+
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
-#include <iostream>
+
 #include "decoration.h"
+#include "soil/include/SOIL/SOIL.h"
+#include <iostream>
 
 // Vetor global de objetos decorativos
 static std::vector<Decoration> decorations;
 
 Decoration::Decoration()
-    : posX(0.0f), posY(0.0f), posZ(0.0f),
-      scale(1.0f), rotY(0.0f) { }
+  : posX(0.0f), posY(0.0f), posZ(0.0f),
+    scale(1.0f),
+    rotX(0.0f), rotY(0.0f), rotZ(0.0f),  // agora zeramos os 3 eixos
+    textureID(0), useTexture(false)
+{
+}
 
 bool Decoration::loadOBJ(const std::string& filename) {
     tinyobj::attrib_t attrib; 
     std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials; // não usaremos agora, mas se quiser usar materiais, eles ficam aqui
-
+    std::vector<tinyobj::material_t> materials;
     std::string warn, err;
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
 
+    // Carrega o OBJ (triangulando automaticamente)
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,
+                                filename.c_str(), nullptr, true);
     if (!warn.empty()) {
-        std::cerr << "TinyObj WARNING: " << warn << std::endl;
+        std::cerr << "TinyOBJ WARNING: " << warn << std::endl;
     }
     if (!err.empty()) {
-        std::cerr << "TinyObj ERROR: " << err << std::endl;
+        std::cerr << "TinyOBJ ERROR: " << err << std::endl;
     }
     if (!ret) {
         std::cerr << "Falha ao carregar OBJ: " << filename << std::endl;
         return false;
     }
 
-    // Limpa dados prévios
     vertices.clear();
     normals.clear();
     texcoords.clear();
 
-    // Para cada shape (obj pode ter vários "shapes" ou subobjetos)
+    // Para cada shape (obj pode ter vários subobjetos)
     for (size_t s = 0; s < shapes.size(); s++) {
-        // Para cada face (índices)
         size_t indexOffset = 0;
+        // Para cada face
         for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-            int fv = shapes[s].mesh.num_face_vertices[f]; // geralmente 3 para triângulos
+            int fv = shapes[s].mesh.num_face_vertices[f]; // geralmente 3 (triângulos)
 
-            // Para cada vértice da face
             for (int v = 0; v < fv; v++) {
                 tinyobj::index_t idx = shapes[s].mesh.indices[indexOffset + v];
 
-                // Positions
+                // Posição
                 float vx = attrib.vertices[3 * idx.vertex_index + 0];
                 float vy = attrib.vertices[3 * idx.vertex_index + 1];
                 float vz = attrib.vertices[3 * idx.vertex_index + 2];
@@ -53,8 +60,9 @@ bool Decoration::loadOBJ(const std::string& filename) {
                 vertices.push_back(vy);
                 vertices.push_back(vz);
 
-                // Normals (se existir)
-                if (idx.normal_index >= 0 && (size_t)(3*idx.normal_index + 2) < attrib.normals.size()) {
+                // Normal
+                if (idx.normal_index >= 0 && 
+                    (size_t)(3*idx.normal_index+2) < attrib.normals.size()) {
                     float nx = attrib.normals[3*idx.normal_index + 0];
                     float ny = attrib.normals[3*idx.normal_index + 1];
                     float nz = attrib.normals[3*idx.normal_index + 2];
@@ -62,18 +70,19 @@ bool Decoration::loadOBJ(const std::string& filename) {
                     normals.push_back(ny);
                     normals.push_back(nz);
                 } else {
-                    // Se não existir, use 0,0,0 ou calcule depois
+                    // Se não tiver normal, coloque (0,0,0)
                     normals.push_back(0.0f);
                     normals.push_back(0.0f);
                     normals.push_back(0.0f);
                 }
 
-                // Texcoords (se quiser)
-                if (idx.texcoord_index >= 0 && (size_t)(2*idx.texcoord_index + 1) < attrib.texcoords.size()) {
-                    float tx = attrib.texcoords[2*idx.texcoord_index + 0];
-                    float ty = attrib.texcoords[2*idx.texcoord_index + 1];
-                    texcoords.push_back(tx);
-                    texcoords.push_back(ty);
+                // Coordenadas de textura (UV)
+                if (idx.texcoord_index >= 0 &&
+                    (size_t)(2*idx.texcoord_index+1) < attrib.texcoords.size()) {
+                    float tu = attrib.texcoords[2*idx.texcoord_index + 0];
+                    float tv = attrib.texcoords[2*idx.texcoord_index + 1];
+                    texcoords.push_back(tu);
+                    texcoords.push_back(tv);
                 } else {
                     texcoords.push_back(0.0f);
                     texcoords.push_back(0.0f);
@@ -86,82 +95,124 @@ bool Decoration::loadOBJ(const std::string& filename) {
     return true;
 }
 
+bool Decoration::setTexture(const std::string& texturePath) {
+    // Carrega a textura via SOIL
+    GLuint texID = SOIL_load_OGL_texture(
+        texturePath.c_str(),
+        SOIL_LOAD_AUTO,
+        SOIL_CREATE_NEW_ID,
+        SOIL_FLAG_INVERT_Y
+    );
+    if (!texID) {
+        std::cerr << "Erro ao carregar textura: " << texturePath 
+                  << " -> " << SOIL_last_result() << std::endl;
+        return false;
+    }
+    // Configura parâmetros básicos
+    glBindTexture(GL_TEXTURE_2D, texID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Salva no objeto
+    textureID = texID;
+    useTexture = true;
+
+    // Desvincula
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return true;
+}
+
 void Decoration::draw() {
     glPushMatrix();
     glTranslatef(posX, posY, posZ);
-    // A ordem das rotações importa. Exemplo (X, Y, Z):
+
+    // Aplique a rotação em X, Y, Z nesta ordem:
     glRotatef(rotX, 1.0f, 0.0f, 0.0f);
     glRotatef(rotY, 0.0f, 1.0f, 0.0f);
     glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
-    glScalef(scale, scale, scale);
-        // Se os normais estiverem válidos, habilite lighting
-        // e use GL_SMOOTH shading para aproveitar
-        // ou já está habilitado globalmente
 
-        // Modo simples: immediate
-        glBegin(GL_TRIANGLES);
-        for (size_t i = 0; i < vertices.size(); i += 3) {
-            // Normais
-            if (i < normals.size()) {
-                glNormal3f(normals[i], normals[i+1], normals[i+2]);
-            }
-            // Se quiser textura, chamaria: glTexCoord2f(texcoords[...], texcoords[...]);
-            glVertex3f(vertices[i], vertices[i+1], vertices[i+2]);
+    glScalef(scale, scale, scale);
+
+    if (useTexture) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+    }
+
+    glBegin(GL_TRIANGLES);
+    for (size_t i = 0; i < vertices.size(); i += 3) {
+        // Normal
+        if (i < normals.size()) {
+            glNormal3f(normals[i], normals[i+1], normals[i+2]);
         }
-        glEnd();
+
+        // TexCoords
+        if (useTexture) {
+            size_t texIndex = (i/3)*2;
+            if (texIndex + 1 < texcoords.size()) {
+                glTexCoord2f(texcoords[texIndex], texcoords[texIndex+1]);
+            }
+        }
+        // Vértice
+        glVertex3f(vertices[i], vertices[i+1], vertices[i+2]);
+    }
+    glEnd();
+
+    if (useTexture) {
+        glDisable(GL_TEXTURE_2D);
+    }
+
     glPopMatrix();
 }
 
-// --------------- Funções globais ---------------
+
+// -------------------------------------------------------------
+// Funções globais (gerenciamento de várias decorações)
+
 void initializeDecorations() {
+    
     // Exemplo: criamos uma rocha, um baú, etc.
     {
         Decoration rock;
-        // Carrega o arquivo OBJ de uma rocha
-        rock.loadOBJ("models/seashell_obj.obj");  // Ajuste o caminho conforme necessário
-        rock.posX = 2.0f;  // posicionado em (2, -2.5, 0) no fundo
-        rock.posY = -2.5f;
+        rock.loadOBJ("models/seashell_obj.obj");
+        rock.posX = 2.0f;
+        rock.posY = -2.3f;
         rock.posZ = 0.0f;
         rock.scale = 0.5f;
-        rock.rotY  = 0.0f;
+    
+        rock.rotX = 0.0f; // sem girar no X
+        rock.rotY = 0.0f; // sem girar no Y
+        rock.rotZ = 0.0f; // sem girar no Z
+    
         decorations.push_back(rock);
     }
+    
 
+    // Exemplo: Mergulhador
     {
         Decoration diver;
-        // Carrega o arquivo OBJ (ajuste o caminho conforme sua estrutura)
         diver.loadOBJ("mergulhador/13018_Aquarium_Deep_Sea_Diver_v1_L1.obj");
-
-        // Posiciona no fundo do aquário (Y = -2.5 se seu aquário tem 5.0 de altura)
-        diver.posX = 0.0f;
-        diver.posY = -1.5f;
-        diver.rotX = -90.0f;  // rotX de -90 graus pode colocar o modelo em pé
-        diver.rotY = -5.5f; // esse eixo é para rotacionar o mergulhador
-        diver.rotZ = 0.0f;
-        diver.scale = 0.1f; // ou 0.1f, ou 2.0f, teste valores
+        diver.posX = 2.0f;
+        diver.posY = -1.5f; 
+        diver.posZ = 0.0f;
+        diver.scale = 0.1f;
+        diver.rotX = -90.0f;
+        diver.rotY  = 0.0f;
         
 
-        // Ajuste a escala se estiver muito grande/pequeno
-        diver.scale = 0.1111f; // 1/8 do tamanho original, para ser 1/9 seria 0.1111f
+        // Carrega a textura do mergulhador (JPG)
+        diver.setTexture("mergulhador/13018_Aquarium_Deep_Sea_Diver_diff.jpg");
 
-        // Se quiser rotacionar
-        diver.rotY = 0.0f; //para deixar ele em pé basta colocar 0.0f
-
-        // Adiciona ao vetor global
         decorations.push_back(diver);
     }
-
-   
+    // ...
 }
 
 void updateDecorations(float /*deltaTime*/) {
-    // Se quiser animar algo, rotacionar, etc., faça aqui
-    // Exemplo: girar uma estátua
-    // decorations[1].rotY += 10.0f * deltaTime;
+    // Caso queiramos animar...
 }
 
 void drawDecorations() {
-    for (size_t i = 0; i < decorations.size(); i++) {
-        decorations[i].draw();
+    for (auto &dec : decorations) {
+        dec.draw();
     }
 }
