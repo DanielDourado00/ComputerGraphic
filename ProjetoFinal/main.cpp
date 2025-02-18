@@ -26,36 +26,32 @@ void display() {
     drawBubbles();
 
     // --- Renderização de sombras ---
-    // Definindo o plano para a projeção da sombra (y + 2.5 = 0)
-    GLfloat groundPlane[4] = { 0.0f, 1.0f, 0.0f, 2.5f };
-    // A mesma posição de luz usada em initLighting()
-    GLfloat lightPos[4]   = { 0.0f, 2.0f, 2.0f, 1.0f }; 
+    // Se deseja manter as sombras vindas de GL_LIGHT0, use a posição a seguir.
+    // Caso queira sombras do Spotlight (GL_LIGHT1), troque lightPos para { 0.0f, 2.5f, 0.0f, 1.0f } (ou o valor que estiver em initSpotlight()).
+    GLfloat groundPlane[4] = { 0.0f, 1.0f, 0.0f, 2.5f }; 
+    //GLfloat lightPos[4]   = { 0.0f, 2.0f, 2.0f, 1.0f }; 
+    GLfloat lightPos[4] = { 0.0f, 2.5f, 0.0f, 1.0f };
     GLfloat shadowMat[4][4];
     setShadowMatrix(shadowMat, groundPlane, lightPos);
 
-    // Multiplica pela matriz de sombra
     glPushMatrix();
         glMultMatrixf((GLfloat*)shadowMat);
 
-        // Desativa a iluminação para desenhar “silhuetas”
+        // Desliga a iluminação para desenhar somente silhuetas (sombra)
         glDisable(GL_LIGHTING);
-        // Se quiser sombra sólida, também desative o blending ou defina cor com alpha = 1.0
-        glDisable(GL_BLEND);
-        
-        // Define cor preta (ou cinza) para a sombra
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+        glDisable(GL_BLEND);        
+        glColor4f(0.0f, 0.0f, 0.0f, 1.0f); // Sombra preta sólida
 
-        // Agora chamamos drawFish(true) para desenhar os peixes em modo sombra
+        // Desenha os peixes em modo sombra
         drawFish(true);
 
-        // Restaura o estado
+        // Restaura o estado original
         glEnable(GL_LIGHTING);
     glPopMatrix();
     // --- Fim da projeção de sombras ---
 
     glutSwapBuffers();
 }
-
 
 void reshape(int w, int h) {
     if (h == 0) h = 1;
@@ -127,43 +123,42 @@ void mouseMotion(int x, int y) {
     glutPostRedisplay();
 }
 
-// Função de timer para atualizar o estado da cena (peixes e bolhas)
+// Função de timer para atualizar o estado da cena (peixes, bolhas, algas)
 void timer(int value) {
     updateFish(0.1f);
     updateBubbles(0.1f);
-    updateAlgae(0.1f);  // Atualiza o movimento das algas
+    updateAlgae(0.1f);
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);  // Aproximadamente 60 FPS
 }
 
-
-
-
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-glutInitWindowSize(800, 600);
-glutCreateWindow("Aquário 3D");
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("Aquário 3D");
 
-glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
-// Inicializa módulos (including initializeAquarium() que carrega a textura)
-initLighting();
-initializeAquarium();
-initializeAlgae();
-initializeFish();
-initializeBubbles();
+    // Inicializa iluminação básica + Spotlight + Fog
+    initLighting();
+    initSpotlight(); // Adiciona o holofote (GL_LIGHT1)
+    initFog();
 
-// Registra os callbacks
-glutDisplayFunc(display);
-glutReshapeFunc(reshape);
-glutKeyboardFunc(keyboard);
-glutMotionFunc(mouseMotion);
-glutPassiveMotionFunc(mouseMotion);
-glutTimerFunc(0, timer, 0);
+    // Inicializa as texturas, algas, peixes, bolhas
+    initializeAquarium();
+    initializeAlgae();
+    initializeFish();
+    initializeBubbles();
 
-glutMainLoop();
+    // Registra os callbacks
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutMotionFunc(mouseMotion);
+    glutPassiveMotionFunc(mouseMotion);
+    glutTimerFunc(0, timer, 0);
 
+    glutMainLoop();
     return 0;
 }
-
