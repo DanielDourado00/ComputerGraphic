@@ -1,5 +1,4 @@
-// bubbles.cpp
-#include "bubbles.h"
+#include "headers/bubbles.h"
 #include <cstdlib>
 #include <ctime>
 

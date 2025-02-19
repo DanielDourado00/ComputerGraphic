@@ -1,7 +1,7 @@
 #include <GL/glut.h>
 #include <cstdio>
-#include "soil/include/SOIL/SOIL.h"
-#include "aquarium.h"
+#include "grafica/soil/include/SOIL/SOIL.h"
+#include "headers/aquarium.h"
 
 // Variável global para armazenar o ID da textura (fundo)
 static GLuint sandTextureID;
@@ -9,7 +9,7 @@ static GLuint sandTextureID;
 void initializeAquarium() {
     // Carregando a textura de areia com SOIL
     sandTextureID = SOIL_load_OGL_texture(
-        "image/areia.png",
+        "grafica/image/areia.png",
         SOIL_LOAD_AUTO,
         SOIL_CREATE_NEW_ID,
         SOIL_FLAG_INVERT_Y  // inverte a imagem verticalmente, se precisar

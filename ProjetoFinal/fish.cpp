@@ -1,13 +1,13 @@
 // fish.cpp
-#include "fish.h"
-#include "fish3d.h"
+#include "headers/fish.h"
+#include "headers/fish3d.h"
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
 
 // Carregaremos o modelo 3D do peixe apenas uma vez
 static Fish3D fishModel; 
-static bool fishModelLoaded = false;
+static bool fishModelLoaded = false; // flag para saber se já carregou
 
 const float halfWidth  = 10.0f / 2.0f;
 const float halfHeight = 5.0f  / 2.0f;
@@ -73,9 +73,7 @@ void initializeFish() {
 
     // Carrega o modelo OBJ do peixe se ainda não foi carregado
     if (!fishModelLoaded) {
-        // Supondo que você tenha "12265_Fish_v1_L2.obj" e "12265_Fish_v1_L2.mtl" em "fishModel/"
-        // e no .mtl tenha "map_Kd fish.jpg"
-        fishModel.loadModel("fishModel/12265_Fish_v1_L2.obj", "fishModel/");
+        fishModel.loadModel("grafica/fishModel/12265_Fish_v1_L2.obj", "grafica/fishModel/");
         fishModelLoaded = true;
     }
 
@@ -91,9 +89,6 @@ void updateFish(float deltaTime) {
 }
 
 void drawFish(bool shadowMode) {
-    // Se for shadowMode, você não quer texturas ou cores; mas se quiser sombras pretas,
-    // você pode desabilitar a textura no fishModel.draw() se shadowMode == true.
-    // Por simplicidade, ignorei esse caso, mas você pode tratar igual fez antes.
 
     for (int i = 0; i < NUM_FISH; i++) {
         fishArray[i].draw();

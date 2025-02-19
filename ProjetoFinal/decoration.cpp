@@ -1,10 +1,8 @@
-// decoration.cpp
-
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h" //libs para carregar objetos 3D
+#include "headers/tiny_obj_loader.h" //libs para carregar objetos 3D
 
-#include "decoration.h"
-#include "soil/include/SOIL/SOIL.h"
+#include "headers/decoration.h"
+#include "grafica/soil/include/SOIL/SOIL.h"
 #include <iostream>
 
 // Vetor global de objetos decorativos
@@ -178,9 +176,9 @@ void initializeDecorations() {
     {
         Decoration terrain;
 
-        terrain.loadOBJ("terreno/map_697494cf-ea4b-4cf1-8341-dd55369a8c5e_densified_mesh_textured.obj");
+        terrain.loadOBJ("grafica/terreno/map_697494cf-ea4b-4cf1-8341-dd55369a8c5e_densified_mesh_textured.obj");
 
-        terrain.setTexture("terreno/map_697494cf-ea4b-4cf1-8341-dd55369a8c5e_densified_mesh_textured_4096.jpg");
+        terrain.setTexture("grafica/terreno/map_697494cf-ea4b-4cf1-8341-dd55369a8c5e_densified_mesh_textured_4096.jpg");
         
         // Ajuste a posição para onde você quer exibir no aquário
         terrain.posX = 0.0f;
@@ -201,7 +199,7 @@ void initializeDecorations() {
     // Exemplo: Mergulhador
     {
         Decoration diver;
-        diver.loadOBJ("mergulhador/13018_Aquarium_Deep_Sea_Diver_v1_L1.obj");
+        diver.loadOBJ("grafica/mergulhador/13018_Aquarium_Deep_Sea_Diver_v1_L1.obj");
         diver.posX = 2.2f;
         diver.posY = -2.0f; 
         diver.posZ = 0.45f;
@@ -212,14 +210,14 @@ void initializeDecorations() {
         
 
         // Carrega a textura do mergulhador (JPG)
-        diver.setTexture("mergulhador/13018_Aquarium_Deep_Sea_Diver_diff.jpg");
+        diver.setTexture("grafica/mergulhador/13018_Aquarium_Deep_Sea_Diver_diff.jpg");
 
         decorations.push_back(diver);
     }
     {
         Decoration boat;
         // Carrega o OBJ do navio
-        boat.loadOBJ("navio/Marlow66.obj");
+        boat.loadOBJ("grafica/navio/Marlow66.obj");
     
         // Posição, escala e rotação para que fique visível
         boat.posX = -2.0f;
@@ -230,7 +228,7 @@ void initializeDecorations() {
         boat.rotX = 0.125f;
     
         // Força uma única textura (por exemplo, a da madeira)
-        boat.setTexture("navio/FineWood.jpg");
+        boat.setTexture("grafica/navio/FineWood.jpg");
     
         decorations.push_back(boat);
     }
@@ -238,9 +236,7 @@ void initializeDecorations() {
 
     }
 
-void updateDecorations(float /*deltaTime*/) {
-    // Caso queiramos animar...
-}
+
 
 void drawDecorations() {
     for (auto &dec : decorations) {

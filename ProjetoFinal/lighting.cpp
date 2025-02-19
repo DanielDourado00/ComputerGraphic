@@ -1,5 +1,4 @@
-// lighting.cpp
-#include "lighting.h"
+#include "headers/lighting.h"
 #include <cstdio>
 
 void initLighting() {
@@ -83,13 +82,13 @@ void setShadowMatrix(GLfloat shadowMat[4][4], const GLfloat groundplane[4], cons
     shadowMat[3][3] = dot - lightpos[3] * groundplane[3];
 }
 
-// NOVA FUNÇÃO: configura a neblina
+//configura a neblina
 void initFog() {
     glEnable(GL_FOG);
 
     // Ajuste a cor do fog para um azul que combine com o aquário
     GLfloat fogColor[4] = {0.0f, 0.5f, 0.7f, 1.0f}; 
-    // (você pode mudar o tom conforme desejar)
+
 
     glFogfv(GL_FOG_COLOR, fogColor);
     // Ajusta a cor de limpeza de tela para harmonizar com a neblina
@@ -99,8 +98,7 @@ void initFog() {
     glFogi(GL_FOG_MODE, GL_EXP2);
     glFogf(GL_FOG_DENSITY, 0.15f);
     glFogf(GL_FOG_START, 5.0f);   // onde a neblina começa a afetar os objetos
-    glFogf(GL_FOG_END, 20.0f);    // onde a neblina é total
-    // Se quiser mais densidade, diminua o FOG_END ou use GL_EXP2/GL_EXP e glFogf(GL_FOG_DENSITY, 0.02f);
+    glFogf(GL_FOG_END, 20.0f);    // onde a neblina é total;
 
     glHint(GL_FOG_HINT, GL_NICEST);
 }

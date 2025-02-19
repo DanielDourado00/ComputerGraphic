@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.l": "plaintext",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "cstdlib": "cpp"
     }
 }

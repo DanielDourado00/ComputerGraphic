@@ -1,5 +1,5 @@
 // algae.cpp
-#include "algae.h"
+#include "headers/algae.h"
 #include <cmath>
 #include <cstdlib>
 #include <ctime>

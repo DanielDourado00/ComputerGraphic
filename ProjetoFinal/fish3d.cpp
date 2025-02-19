@@ -1,6 +1,6 @@
-#include "fish3d.h"
-#include "tiny_obj_loader.h"
-#include "soil/include/SOIL/SOIL.h"
+#include "headers/fish3d.h"
+#include "headers/tiny_obj_loader.h"
+#include "grafica/soil/include/SOIL/SOIL.h"
 #include <iostream>
 
 Fish3D::Fish3D()
@@ -36,13 +36,8 @@ bool Fish3D::loadModel(const std::string& objPath, const std::string& basePath) 
     normals.clear();
     texcoords.clear();
 
-    // Aqui assumimos que o peixe usa 1 material principal (por ex. fish.jpg).
-    // Se seu .mtl tiver 1 material com 'map_Kd fish.jpg', a string materials[0].diffuse_texname deve ter "fish.jpg"
-    // Caso o modelo tenha múltiplos materiais, seria preciso agrupar ou separar submeshes.
-
-    // Carrega a(s) textura(s) do material[0] se existir
     if (!materials.empty()) {
-        std::string texName = materials[0].diffuse_texname; // ex: "fish.jpg"
+        std::string texName = materials[0].diffuse_texname;
         if (!texName.empty()) {
             std::string texPath = basePath + texName;
             GLuint texID = SOIL_load_OGL_texture(

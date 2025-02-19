@@ -1,6 +1,5 @@
-// camera.cpp
 #include <GL/glut.h>
-#include "camera.h"
+#include "headers/camera.h"
 
 Camera::Camera() : posX(0.0f), posY(0.0f), posZ(2.0f), yaw(0.0f), pitch(0.0f) {}
 

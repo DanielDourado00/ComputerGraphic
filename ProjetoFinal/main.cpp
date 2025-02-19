@@ -6,13 +6,13 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 /* Musica */
-#include "aquarium.h"
-#include "camera.h"
-#include "fish.h"
-#include "algae.h"
-#include "bubbles.h"
-#include "lighting.h"
-#include "decoration.h"
+#include "headers/aquarium.h"
+#include "headers/camera.h"
+#include "headers/fish.h"
+#include "headers/algae.h"
+#include "headers/bubbles.h"
+#include "headers/lighting.h"
+#include "headers/decoration.h"
 
 // Instância global da câmera
 Camera camera;
@@ -139,9 +139,8 @@ void timer(int value) {
     updateFish(0.1f);
     updateBubbles(0.1f);
     updateAlgae(0.1f);
-    updateDecorations(0.1f);
     glutPostRedisplay();
-    glutTimerFunc(16, timer, 0);  // Aproximadamente 60 FPS
+    glutTimerFunc(16, timer, 0); // 60 FPS
 }
 
 void specialKeys(int key, int x, int y) {
@@ -239,7 +238,7 @@ int main(int argc, char** argv) {
         std::cerr << "Falha ao inicializar áudio! Prosseguindo sem som...\n";
     } else {
         // Tente tocar a música
-        if (!loadAndPlayMusic("music/musicjapao.mp3")) {
+        if (!loadAndPlayMusic("grafica/music/musicjapao.mp3")) {
             std::cerr << "Falha ao carregar/tocar música. Prosseguindo sem som...\n";
         }
     }
